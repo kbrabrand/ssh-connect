@@ -1,0 +1,42 @@
+#!/bin/sh
+
+argNum=$#;
+
+if [ $argNum == 0 ]
+then
+    echo "usage: connect hostname [username] [mountname] [remote path]";
+elif [ $argNum -gt 0 ]
+then
+    username="";
+    path="";
+    mountname=$1;
+    mountbase=~/sshfsmount;
+    mountpath="$mountbase/$1";
+
+    # Check if mount dir exists and create if not
+    if [ ! -d $mountbase ]
+    then
+        mkdir $mountbase;
+    fi
+
+    # Check if dir for this host exists and create if not
+    if [ ! -d $mountpath ]
+    then
+        mkdir $mountpath;
+    fi
+
+    if (( "$argNum" >= 2 )); then
+        username="$2@";
+    fi
+
+    if (( $argNum >= 3 )); then
+        mountname=$3;
+    fi
+
+    if (( $argNum >= 4 )); then
+        path=$4;
+    fi
+
+    # Mount volume
+    sshfs $username$1:$path $mountpath -ofollow_symlinks -onoappledouble -ovolname=$mountname -o Ciphers=arcfour
+fi
